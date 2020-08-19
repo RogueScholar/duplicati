@@ -110,17 +110,7 @@ namespace Duplicati.Library.Snapshots
         {
             string[] tmp = null;
             var spath = ConvertToSnapshotPath(localFolderPath);
-
-            try
-            {
-                tmp = SystemIO.IO_WIN.GetDirectories(spath); 
-            }
-            catch (DirectoryNotFoundException) //TODO: Do we really need this??
-            {
-                spath = SystemIOWindows.PrefixWithUNC(spath);
-                tmp = SystemIO.IO_WIN.GetDirectories(spath);
-            }
-
+            tmp = SystemIO.IO_WIN.GetDirectories(spath); 
             var root = Util.AppendDirSeparator(SystemIO.IO_WIN.GetPathRoot(localFolderPath));
             var volumePath = Util.AppendDirSeparator(ConvertToSnapshotPath(root));
             volumePath = SystemIOWindows.PrefixWithUNC(volumePath);
@@ -145,17 +135,7 @@ namespace Duplicati.Library.Snapshots
 
             string[] files = null;
             var spath = ConvertToSnapshotPath(localFolderPath);
-
-            // First try without long UNC prefixed
-            try
-            {
-                files = SystemIO.IO_WIN.GetFiles(spath);
-            }
-            catch (DirectoryNotFoundException) //TODO: Do we really need this??
-            {
-                spath = SystemIOWindows.PrefixWithUNC(spath);
-                files = SystemIO.IO_WIN.GetFiles(spath);
-            }
+            files = SystemIO.IO_WIN.GetFiles(spath);
 
             // convert back to non-shadow, i.e., non-vss version
             var root = Util.AppendDirSeparator(SystemIO.IO_WIN.GetPathRoot(localFolderPath));
@@ -286,7 +266,10 @@ namespace Duplicati.Library.Snapshots
             var root = SystemIO.IO_WIN.GetPathRoot(localPath);
             var volumePath = _vssBackupComponents.GetVolumeFromCache(root);
 
-            // Note: Do NOT use Path.Combine as it strips the UNC path prefix
+            // Note that using a simple Path.Combine() for the following code
+            // can result in invalid snapshot paths; e.g., if localPath is
+            // @"C:\", mappedPath would not have the required trailing
+            // directory separator.
             var subPath = localPath.Substring(root.Length);
             if (!subPath.StartsWith(Util.DirectorySeparatorString, StringComparison.Ordinal))
             {

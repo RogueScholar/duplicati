@@ -11,6 +11,9 @@
 # Then load overrides
 %include %{_topdir}/SOURCES/%{namer}-buildinfo.spec
 
+# Make sure it does not break because we have som arch-dependant libraries bundled
+%define _binaries_in_noarch_packages_terminate_build 0
+
 Name:	%{namer}
 Version:	%{_buildversion}
 Release:	%{_buildtag}
@@ -97,7 +100,7 @@ rm -rf licenses/gpg
 rm -rf win-x64\storj_uplink.dll
 rm -rf win-x86\storj_uplink.dll
 rm -rf storj_uplink.dll
-rm -rf storj_uplink.dylib
+rm -rf libstorj_uplink.dylib
 
 
 %install
